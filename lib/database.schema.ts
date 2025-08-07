@@ -1,5 +1,7 @@
 // Firestore Database Schema for Expense Tracker (Groups-based)
 
+import { Timestamp } from "firebase/firestore";
+
 /**
  * Collection: artifacts/{appId}/groups/{groupId}/expenses
  * Document fields:
@@ -18,9 +20,9 @@ export interface Expense {
   amount: number;
   category: string;
   description: string;
-  expenseDate: Date;
+  expenseDate: Timestamp; // Can be stored as Timestamp or Date object
   segregation: string;
-  createdAt: Date;
+  createdAt: Date; // Can be stored as Timestamp or Date object
 }
 
 /**

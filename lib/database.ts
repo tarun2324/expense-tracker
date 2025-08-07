@@ -14,13 +14,43 @@ import {
 } from 'firebase/firestore';
 import { Expense, ExpenseData, GroupMeta, Income, IncomeData } from "./database.schema";
 import { db } from "./firebase";
+// Add user to Firestore users collection if not exists
+import type { User as FirebaseUser } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
+export const addUserIfNotExists = async (user: FirebaseUser) => {
+  if (!user) return;
+  const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) {
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || '',
+      photoURL: user.photoURL || '',
+      createdAt: new Date()
+    });
+  }
+};
 
 const appId = "default-app-id"; // Replace with your actual app ID
 export const PERSONAL_GROUP_ID = 'personal-expenses'; // Default personal group ID
 
-export const getGroupExpenses = async (groupId: string): Promise<Expense[]> => {
+export const getGroupExpensesForMonth = async (
+  groupId: string,
+  year: number,
+  month: number
+): Promise<Expense[]> => {
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 1);
+
   const expensesRef = collection(db, `artifacts/${appId}/groups/${groupId}/expenses`);
-  const querySnapshot = await getDocs(expensesRef);
+  const q = query(
+    expensesRef,
+    where("expenseDate", ">=", Timestamp.fromDate(startDate)),
+    where("expenseDate", "<", Timestamp.fromDate(endDate))
+  );
+  const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()

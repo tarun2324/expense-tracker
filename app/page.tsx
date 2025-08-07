@@ -9,6 +9,7 @@ import { useAuthUserContext } from '@/context/AuthContext';
 import { useGroupContext } from '@/context/GroupContext';
 import { useToast } from '@/context/ToastContext';
 import { subscribeToGroupExpenses } from '@/lib/database';
+import { Expense } from '@/lib/database.schema';
 import { redirect } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -29,7 +30,6 @@ const AppContent = () => {
   const [monthlyExpense, setMonthlyExpense] = useState<number>(0);
   const [categorySummary, setCategorySummary] = useState<CategorySummary>({});
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [showAllTransactions, setShowAllTransactions] = useState<boolean>(false);
 
   const [currentView, setCurrentView] = useState<ViewType>(ViewType.Tracker);
 
@@ -50,7 +50,7 @@ const AppContent = () => {
     if (!selectedGroup) {
       setExpenses([]);
       return;
-    }
+    } 
     // Always subscribe to group expenses, using personal group if needed
     const unsubscribe = subscribeToGroupExpenses(
       selectedGroup?.id, // Replace with actual group logic if needed
@@ -58,9 +58,9 @@ const AppContent = () => {
         setExpenses(
           fetchedExpenses.map((exp) => ({
             ...exp,
-            expenseDate: exp.expenseDate instanceof Date
-              ? exp.expenseDate
-              : new Date(exp.expenseDate),
+            // expenseDate: exp.expenseDate instanceof Date
+            //   ? exp.expenseDate
+            //   : new Date(exp.expenseDate),
           }))
         );
       },
@@ -87,17 +87,25 @@ const AppContent = () => {
     const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
 
     expenses.forEach(expense => {
-      if (expense.expenseDate >= startOfDay && expense.expenseDate < endOfDay) {
+      // Convert Firestore Timestamp to JS Date if needed
+      const expenseDate =
+        expense.expenseDate instanceof Date
+          ? expense.expenseDate
+          : (expense.expenseDate?.toDate ? expense.expenseDate.toDate() : new Date(expense.expenseDate.seconds * 1000));
+
+      if (expenseDate >= startOfDay && expenseDate < endOfDay) {
         dailyTotal += expense.amount;
         const displayCategory = expense.segregation ? `${expense.segregation} - ${expense.category}` : expense.category;
         summary[displayCategory] = (summary[displayCategory] || 0) + expense.amount;
       }
-      if (expense.expenseDate >= startOfMonth && expense.expenseDate <= endOfMonth) {
+      if (expenseDate >= startOfMonth && expenseDate <= endOfMonth) {
         monthlyTotal += expense.amount;
         monthlyCategoryAggregates[expense.category] = (monthlyCategoryAggregates[expense.category] || 0) + expense.amount;
       }
     });
-
+    // Firestore Timestamp comparison: always convert to JS Date first
+    // (already done above as expenseDate)
+    // Now expenseDate is a JS Date, so comparisons work as expected
     setDailyExpense(dailyTotal);
     setMonthlyExpense(monthlyTotal);
     setCategorySummary(summary);
@@ -110,14 +118,9 @@ const AppContent = () => {
 
   }, [expenses, selectedDate]);
 
-  const recentTransactions = useMemo(
-    () => showAllTransactions ? expenses : expenses.slice(0, 3),
-    [showAllTransactions, expenses]
-  );
-
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center p-4 sm:p-0 font-inter relative">
-      <div className="bg-white dark:bg-zinc-950 p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900 flex md:items-start sm:items-start justify-center md:p-4 sm:p-0 font-inter relative">
+      <div className="bg-white dark:bg-zinc-950 p-6 md:rounded-3xl sm:rounded-none shadow-2xl w-full max-w-md border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
 
         <Settings />
 
@@ -156,10 +159,7 @@ const AppContent = () => {
             </div>
 
             <RecentTransactions
-              recentTransactions={recentTransactions}
-              expensesLength={expenses.length}
-              showAllTransactions={showAllTransactions}
-              setShowAllTransactions={setShowAllTransactions}
+              selectedDate={selectedDate}
             />
 
             <ExpenseForm

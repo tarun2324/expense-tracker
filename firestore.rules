@@ -27,5 +27,16 @@ service cloud.firestore {
       allow create: if request.auth != null && (request.auth.uid in get(/databases/$(database)/documents/artifacts/$(appId)/groups/$(groupId)).data.users);
       allow update, delete: if request.auth != null && (request.auth.uid == resource.data.userId);
     }
+
+    // Users collection under artifacts
+    match /artifacts/{appId}/users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /artifacts/{appId}/users {
+      allow update, create, delete: false;
+      allow read: if request.auth != null;
+    }
   }
 }

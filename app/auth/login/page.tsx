@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
+import { addUserIfNotExists } from '@/lib/database';
 import { useRouter } from 'next/navigation';
 import { useAuthUserContext } from '@/context/AuthContext';
 
@@ -14,7 +15,18 @@ const LoginPage: React.FC = () => {
   }, [user, router]);
 
   const handleGoogleSignIn = async () => {
-    await loginWithGoogle();
+    let currentUser = user;
+    try {
+      const userCred = await loginWithGoogle()
+      if (userCred && userCred.user) {
+        currentUser = userCred.user;
+      }
+    } catch (e) {
+      // ignore, fallback to context user
+    }
+    if (currentUser) {
+      await addUserIfNotExists(currentUser);
+    }
   };
 
   return (

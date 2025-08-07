@@ -2,6 +2,7 @@
 import { useAuthUserContext } from "@/context/AuthContext";
 import React, { useState } from "react";
 import { useGroupContext } from "@/context/GroupContext";
+import Link from "next/link";
 
 const Settings: React.FC = () => {
   const { loginWithGoogle, logout, user, loading } = useAuthUserContext();
@@ -88,6 +89,15 @@ const Settings: React.FC = () => {
                         </button>
                       </li>
                     ))}
+                    <li>
+                      <Link
+                        href="/group"
+                        className="block w-full text-left px-3 py-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        Add Group
+                      </Link>
+                    </li>
                   </ul>
                 </div>
               )}

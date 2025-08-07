@@ -1,13 +1,13 @@
 'use client';
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
-import { onAuthStateChanged, User, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
+import { onAuthStateChanged, User, signInWithPopup, signOut, GoogleAuthProvider, UserCredential } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 type AuthUserContextType = {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => Promise<UserCredential | undefined>;
   logout: () => Promise<void>;
 };
 
@@ -25,9 +25,9 @@ function useAuthUser() {
     return () => unsubscribe();
   }, []);
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle: () => Promise<UserCredential | undefined> = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    return await signInWithPopup(auth, provider);
   };
 
   const logout = async () => {
@@ -38,9 +38,22 @@ function useAuthUser() {
 }
 
 export function AuthUserProvider({ children }: { children: ReactNode }) {
-  const auth = useAuthUser();
+  const { user, isAuthenticated, loading, loginWithGoogle, logout } = useAuthUser();
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4 w-full max-w-md mx-auto mt-10">
+      <div className="animate-pulse flex flex-col gap-4">
+        <div className="h-8 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+        <div className="h-12 bg-muted rounded" />
+      </div>
+      </div>
+    );
+  }
   return (
-    <AuthUserContext value={auth}>
+    <AuthUserContext value={{ loading, user, isAuthenticated, loginWithGoogle, logout }}>
       {children}
     </AuthUserContext>
   );
