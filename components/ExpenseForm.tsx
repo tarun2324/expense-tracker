@@ -13,8 +13,30 @@ interface ExpenseFormProps {
   selectedDate?: Date;
 }
 
-const segregations = ['Luxury', 'Essential'];
-const categories = ['Food', 'Entertainment', 'Subscription', 'Miscellaneous', 'Gift', 'Travel'];
+const SEGREGATIONS = ['Luxury', 'Essential'];
+const CATEGORIES = ['Food', 'Entertainment', 'Subscription', 'Miscellaneous', 'Gift', 'Travel'];
+
+const PAYMENT_APPS = [
+  'Cred',
+  'Google Pay',
+  'Phone Pe',
+  'Amazon Pay',
+  'Amazon Money',
+  'Swiggy Wallet',
+  'Zomato Wallet',
+];
+
+const BANKS = [
+  'HDFC',
+  'ICICI',
+  'SBI',
+  'Central Bank',
+  'Diners Black',
+  'Sapphiro',
+  'ICICI Amazon',
+  'Tata Neu',
+  'Cash'
+];
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedDate }) => {
   const { selectedGroup } = useGroupContext();
@@ -26,6 +48,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedDate }) => {
       description: '',
       category: '',
       segregation: '',
+      bank: '',
+      payment_app: '',
     }
   });
 
@@ -85,7 +109,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedDate }) => {
               name="segregation"
               render={({ field }) => (
                 <>
-                  {segregations.map((seg) => (
+                  {SEGREGATIONS.map((seg) => (
                     <FormItem key={seg} className="flex items-center gap-1">
                       <FormControl>
                         <input
@@ -115,7 +139,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedDate }) => {
               name="category"
               render={({ field }) => (
                 <>
-                  {categories.map((cat) => (
+                  {CATEGORIES.map((cat) => (
                     <FormItem key={cat} className="flex items-center gap-1">
                       <FormControl>
                         <input
@@ -134,6 +158,77 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedDate }) => {
                     </FormItem>
                   ))}
                 </>
+              )}
+            />
+          </div>
+        </div>
+        <div className="mb-4 border-t border-gray-200 pt-4">
+          <div className="flex flex-wrap gap-2">
+            <FormField
+              control={form.control}
+              name="bank"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <div className="flex flex-wrap gap-2">
+                    {BANKS.map((bank) => (
+                      <FormItem key={bank} className="flex items-center gap-1">
+                        <FormControl>
+                          <input
+                            type="radio"
+                            name="bank"
+                            value={bank}
+                            checked={field.value === bank}
+                            onChange={() => field.onChange(bank)}
+                            className="hidden peer"
+                            id={`bank-${bank}`}
+                          />
+                        </FormControl>
+                        <Label
+                          htmlFor={`bank-${bank}`}
+                          className="px-2 py-1 rounded text-xs cursor-pointer bg-gray-100 dark:bg-[#1c1c1c] peer-checked:bg-purple-200 peer-checked:text-purple-900"
+                        >
+                          {bank}
+                        </Label>
+                      </FormItem>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </div>
+            <div className="mb-4 border-t border-gray-200 my-2" />
+            <div className="flex flex-wrap gap-2">
+            <FormField
+              control={form.control}
+              name="payment_app"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <div className="flex flex-wrap gap-2">
+                    {PAYMENT_APPS.map((app) => (
+                      <FormItem key={app} className="flex items-center gap-1">
+                        <FormControl>
+                          <input
+                            type="radio"
+                            name="payment_app"
+                            value={app}
+                            checked={field.value === app}
+                            onChange={() => field.onChange(app)}
+                            className="hidden peer"
+                            id={`payment_app-${app}`}
+                          />
+                        </FormControl>
+                        <Label
+                          htmlFor={`payment_app-${app}`}
+                          className="px-2 py-1 rounded text-xs cursor-pointer bg-gray-100 dark:bg-[#1c1c1c] peer-checked:bg-purple-200 peer-checked:text-purple-900"
+                        >
+                          {app}
+                        </Label>
+                      </FormItem>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>

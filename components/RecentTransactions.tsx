@@ -59,10 +59,18 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ selectedDate })
                   className="flex justify-between items-start px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-none"
                 >
                   <div>
+                    <div>
+                      {expense.description}
+                    </div>
                     <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                       {expense.segregation} • {expense.category}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-red-500">
+                    ₹{expense.amount.toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {(() => {
                         const dateValue = expense.expenseDate;
                         if (dateValue instanceof Date) {
@@ -75,10 +83,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ selectedDate })
                         return '';
                       })()}
                     </div>
-                  </div>
-                  <div className="text-sm font-semibold text-red-500">
-                    ₹{expense.amount.toLocaleString('en-IN')}
-                  </div>
+                    </div>
                 </div>
               ))
             ) : (
