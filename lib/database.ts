@@ -1,3 +1,26 @@
+// Push Notification Subscription Management
+export const saveUserPushSubscription = async (uid: string, sub: any) => {
+  const userRef = doc(db, `artifacts/${appId}/users`, uid);
+  const userSnap = await getDoc(userRef);
+  if (userSnap.exists()) {
+    await updateDoc(userRef, { pushSubscription: sub });
+  } else {
+    await setDoc(userRef, { pushSubscription: sub }, { merge: true });
+  }
+  return { success: true };
+};
+
+export const removeUserPushSubscription = async (uid: string) => {
+  const userRef = doc(db, `artifacts/${appId}/users`, uid);
+  await updateDoc(userRef, { pushSubscription: null });
+  return { success: true };
+};
+
+export const getUserPushSubscription = async (uid: string) => {
+  const userRef = doc(db, `artifacts/${appId}/users`, uid);
+  const userSnap = await getDoc(userRef);
+  return userSnap.data()?.pushSubscription || null;
+};
 import {
   addDoc,
   collection,
@@ -16,7 +39,7 @@ import { Expense, ExpenseData, GroupMeta, Income, IncomeData } from "./database.
 import { db } from "./firebase";
 // Add user to Firestore users collection if not exists
 import type { User as FirebaseUser } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 
 export const addUserIfNotExists = async (user: FirebaseUser) => {
   if (!user) return;

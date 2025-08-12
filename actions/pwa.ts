@@ -1,34 +1,32 @@
 'use server'
  
 import webpush from 'web-push'
- 
+import { saveUserPushSubscription, removeUserPushSubscription, getUserPushSubscription } from '@/lib/database';
+
 webpush.setVapidDetails(
   'mailto:fakea1551@gmail.com',
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!
 )
- 
-let subscription: PushSubscription | null = null
- 
-export async function subscribeUser(sub: PushSubscription) {
-  subscription = sub
-  // In a production environment, you would want to store the subscription in a database
-  // For example: await db.subscriptions.create({ data: sub })
-  return { success: true }
+
+
+// Save the subscription object in the user's Firestore document
+export async function subscribeUser(sub: PushSubscription & { uid: string }) {
+  return await saveUserPushSubscription(sub.uid, sub);
 }
  
-export async function unsubscribeUser() {
-  subscription = null
-  // In a production environment, you would want to remove the subscription from the database
-  // For example: await db.subscriptions.delete({ where: { ... } })
-  return { success: true }
+
+export async function unsubscribeUser(uid: string) {
+  return await removeUserPushSubscription(uid);
 }
  
-export async function sendNotification(message: string) {
+
+// Send notification to the user's saved subscription
+export async function sendNotification(uid: string, message: string) {
+  const subscription = await getUserPushSubscription(uid);
   if (!subscription) {
-    throw new Error('No subscription available')
+    throw new Error('No subscription available for this user');
   }
- 
   try {
     await webpush.sendNotification(
       subscription,
