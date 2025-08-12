@@ -66,9 +66,9 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, setSelectedDate }) =>
 
   return (
     <>
-      <div className="flex flex-row flex-wrap items-start justify-between mb-6">
+      <div className="flex flex-row flex-nowrap items-center justify-between mb-6">
         <div
-          className="text-xl font-bold text-zinc-900 dark:text-white cursor-pointer flex items-center"
+          className="font-bold text-zinc-900 dark:text-white cursor-pointer flex items-center"
           onClick={() => {
             setShowCalendar(!showCalendar);
             setCurrentMonthForCalendar(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
@@ -93,7 +93,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, setSelectedDate }) =>
             <button
               key={index}
               onClick={() => setSelectedDate(date)}
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex flex-col items-center justify-center text-xs font-medium transition-all duration-200
+              className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-xs font-medium transition-all duration-200
                 ${
                   date.toDateString() === new Date().toDateString()
                     ? 'bg-black text-white shadow-lg'

@@ -1,10 +1,8 @@
 'use client';
 import Calendar from '@/components/Calendar';
 import ExpenseForm from '@/components/ExpenseForm';
-import Graphs from '@/components/Graphs';
 import GroupBtn from '@/components/GroupBtn';
 import RecentTransactions from '@/components/RecentTransactions';
-import Settings from '@/components/Settings';
 import { useAuthUserContext } from '@/context/AuthContext';
 import { useGroupContext } from '@/context/GroupContext';
 import { useToast } from '@/context/ToastContext';
@@ -50,7 +48,7 @@ const AppContent = () => {
     if (!selectedGroup) {
       setExpenses([]);
       return;
-    } 
+    }
     // Always subscribe to group expenses, using personal group if needed
     const unsubscribe = subscribeToGroupExpenses(
       selectedGroup?.id, // Replace with actual group logic if needed
@@ -119,56 +117,34 @@ const AppContent = () => {
   }, [expenses, selectedDate]);
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900 flex md:items-start sm:items-start justify-center md:p-4 sm:p-0 font-inter relative">
-      <div className="bg-white dark:bg-zinc-950 p-6 md:rounded-3xl sm:rounded-none shadow-2xl w-full max-w-md border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
-
-        <Settings />
-
-        {/* View Switcher */}
-        <GroupBtn
-          items={[
-            { label: 'Tracker', value: ViewType.Tracker },
-            { label: 'Graphs', value: ViewType.Graphs }
-          ]}
-          selected={currentView}
-          onClick={(view) => setCurrentView(view as ViewType)}
-          className="justify-center mb-6 mt-4"
+    <div className="flex md:items-start sm:items-start justify-center md:p-4 sm:p-0 font-inter relative">
+      <div className="bg-white dark:bg-zinc-950 p-6 md:rounded-3xl sm:rounded-none w-full max-w-md relative overflow-hidden">
+      { selectedGroup && <h1 className="text-2xl font-bold my-2">{selectedGroup.name}</h1>}
+        <Calendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+        <div className="bg-zinc-50 dark:bg-zinc-900 p-5 rounded-2xl mb-6 shadow-inner border border-zinc-200 dark:border-zinc-800 transition-all duration-300">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">Daily Expense</div>
+            <div className="text-3xl font-bold text-black dark:text-white">₹{dailyExpense.toLocaleString('en-IN')}</div>
+          </div>
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">Monthly Expense</div>
+            <div className="text-3xl font-bold text-black dark:text-white">₹{monthlyExpense.toLocaleString('en-IN')}</div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+            {Object.entries(categorySummary).map(([category, amount]) => (
+              <div key={category} className="flex justify-between">
+                <span>{category}</span>
+                <span className="font-medium">₹{amount.toLocaleString('en-IN')}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <RecentTransactions
+          selectedDate={selectedDate}
         />
-
-        {currentView === ViewType.Tracker ? (
-          <>
-            <Calendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-
-            <div className="bg-zinc-50 dark:bg-zinc-900 p-5 rounded-2xl mb-6 shadow-inner border border-zinc-200 dark:border-zinc-800 transition-all duration-300">
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">Daily Expense</div>
-                <div className="text-3xl font-bold text-black dark:text-white">₹{dailyExpense.toLocaleString('en-IN')}</div>
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <div className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">Monthly Expense</div>
-                <div className="text-3xl font-bold text-black dark:text-white">₹{monthlyExpense.toLocaleString('en-IN')}</div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                {Object.entries(categorySummary).map(([category, amount]) => (
-                  <div key={category} className="flex justify-between">
-                    <span>{category}</span>
-                    <span className="font-medium">₹{amount.toLocaleString('en-IN')}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <RecentTransactions
-              selectedDate={selectedDate}
-            />
-
-            <ExpenseForm
-              selectedDate={selectedDate}
-            />
-          </>
-        ) : (
-          <Graphs monthlyCategoryData={monthlyCategoryData} selectedDate={selectedDate} />
-        )}
+        <ExpenseForm
+          selectedDate={selectedDate}
+        />
       </div>
     </div>
   );

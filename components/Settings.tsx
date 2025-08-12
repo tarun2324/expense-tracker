@@ -1,4 +1,7 @@
 'use client';
+import dynamic from "next/dynamic";
+const PushNotificationManager = dynamic(() => import("@/components/PushNotificationManager"), { ssr: false });
+const PWAInstallPrompt = dynamic(() => import("@/components/PWAInstallPrompt"), { ssr: false });
 import { useAuthUserContext } from "@/context/AuthContext";
 import React, { useState } from "react";
 import { useGroupContext } from "@/context/GroupContext";
@@ -31,7 +34,7 @@ const Settings: React.FC = () => {
   }, [showDropdown]);
 
   return (
-    <div className="absolute top-4 right-4 z-20">
+    <div className="z-20 text-right p-2">
       <button
         id="settings-button"
         onClick={() => setShowDropdown(!showDropdown)}
@@ -102,6 +105,10 @@ const Settings: React.FC = () => {
                 </div>
               )}
 
+              <div className="px-4 py-2 flex flex-col gap-2">
+                <PushNotificationManager />
+                <PWAInstallPrompt />
+              </div>
               <button
                 onClick={() => {
                   logout?.();
