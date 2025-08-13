@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from "react"
 
-import { subscribeUser, unsubscribeUser, sendNotification } from '@/actions/pwa'
+// import { subscribeUser, unsubscribeUser, sendNotification } from '@/actions/pwa'
 import { useAuthUserContext } from '@/context/AuthContext';
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -50,19 +50,19 @@ const PushNotificationManager = () => {
     });
     setSubscription(sub);
     const serializedSub = { ...JSON.parse(JSON.stringify(sub)), uid: user.uid };
-    await subscribeUser(serializedSub);
+    // await subscribeUser(serializedSub);
   }
 
   async function unsubscribeFromPush() {
     if (!user) return;
     await subscription?.unsubscribe();
     setSubscription(null);
-    await unsubscribeUser(user.uid);
+    // await unsubscribeUser(user.uid);
   }
 
   async function sendTestNotification() {
     if (subscription && user) {
-      await sendNotification(user.uid, message);
+      // await sendNotification(user.uid, message);
       setMessage('');
     }
   }

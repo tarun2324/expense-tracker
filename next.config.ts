@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
+// @ts-ignore
 import wrapPWA from 'next-pwa';
-
 const withPWA = wrapPWA({
   dest: 'public',
   register: true,
